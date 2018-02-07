@@ -15,7 +15,8 @@ enum arrow_ota_result {
 
 enum arrow_ota_init {
     FW_FIRST = 0x00,
-    FW_NEXT
+    FW_NEXT  = 0x01,
+    FW_VERS  = 0x02
 };
 
 typedef int (*__release_cb)(const char *url,
@@ -23,6 +24,7 @@ typedef int (*__release_cb)(const char *url,
                            const char *from,
                            const char *to);
 
+typedef int (*__download_init_cb)(void);
 typedef int (*__download_payload_cb)(const char *,int,int);
 typedef int (*__download_complete_cb)(int);
 

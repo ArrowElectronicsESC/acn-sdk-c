@@ -140,14 +140,14 @@ int ev_DeviceCommand(void *_ev, JsonNode *_parameters) {
   if ( ret < 0 ) {
       DBG("command_handler fail %d", ret);
   }
-
+  // close session after next request
+  http_session_close_set(current_client(), true);
   if ( _error ) {
     arrow_send_event_ans(ev->gateway_hid, failed, json_encode(_error));
     json_delete(_error);
   } else {
     arrow_send_event_ans(ev->gateway_hid, succeeded, NULL);
   }
-  http_session_close_set(current_client(), true);
 
   return 0;
 }
