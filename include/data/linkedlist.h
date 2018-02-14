@@ -13,9 +13,11 @@
 extern "C" {
 #endif
 
+
 typedef struct _linked_list_ {
   struct _linked_list_ *next;
-} linked_list_t;
+} arrow_linked_list_t;
+
 
 #include <stddef.h>
 #if !defined(offsetof)
@@ -34,7 +36,7 @@ typedef struct _linked_list_ {
 #define UN(base) CONCAT(base, __LINE__)
 
 #define for_each_node(p, root, type) \
-  linked_list_t *UN(base_p) = NULL; \
+  arrow_linked_list_t *UN(base_p) = NULL; \
   for ( UN(base_p) = (root)?&(root)->node:NULL, \
     (p) = (root) ; \
     UN(base_p) != NULL ; \
@@ -42,8 +44,8 @@ typedef struct _linked_list_ {
     (p) = UN(base_p)?container_of(UN(base_p), type, node):(p) )
       
 #define for_each_node_hard(p, root, type) \
-  linked_list_t *UN(base_p) = NULL; \
-  linked_list_t UN(base_p_obj) = { NULL }; \
+  arrow_linked_list_t *UN(base_p) = NULL; \
+  arrow_linked_list_t UN(base_p_obj) = { NULL }; \
   for ( UN(base_p) = (root)?&(root)->node:NULL, \
     (p) = (root), \
     UN(base_p_obj) = UN(base_p)?*UN(base_p):UN(base_p_obj) ; \
@@ -58,37 +60,37 @@ typedef struct _linked_list_ {
       } \
 }
 
-linked_list_t *linked_list_add(linked_list_t *root, linked_list_t *el);
-linked_list_t *linked_list_add_first(linked_list_t *root, linked_list_t *el);
-linked_list_t *linked_list_del(linked_list_t *root, linked_list_t *el);
-linked_list_t *linked_list_del_last(linked_list_t *root);
+arrow_linked_list_t *linked_list_add(arrow_linked_list_t *root, arrow_linked_list_t *el);
+arrow_linked_list_t *linked_list_add_first(arrow_linked_list_t *root, arrow_linked_list_t *el);
+arrow_linked_list_t *linked_list_del(arrow_linked_list_t *root, arrow_linked_list_t *el);
+arrow_linked_list_t *linked_list_del_last(arrow_linked_list_t *root);
 
-#define linked_list_head_node linked_list_t node
+#define linked_list_head_node arrow_linked_list_t node
 
 #define linked_list_add_node_last(root, type, el) { \
-  linked_list_t *base_p = linked_list_add((root)?&(root)->node:NULL, &(el)->node); \
+  arrow_linked_list_t *base_p = linked_list_add((root)?&(root)->node:NULL, &(el)->node); \
   root = container_of(base_p, type, node); \
 }
 
 #define linked_list_add_node_first(root, type, el) { \
-  linked_list_t *base_p = linked_list_add_first((root)?&(root)->node:NULL, &(el)->node); \
+  arrow_linked_list_t *base_p = linked_list_add_first((root)?&(root)->node:NULL, &(el)->node); \
   root = container_of(base_p, type, node); \
 }
 
 #define linked_list_del_node(root, type, el) { \
-  linked_list_t *base_p = linked_list_del(&(root)->node, &(el)->node); \
+  arrow_linked_list_t *base_p = linked_list_del(&(root)->node, &(el)->node); \
   if ( base_p ) root = container_of(base_p, type, node); \
   else root = NULL; \
 }
 
 #define linked_list_del_node_first(root, type) { \
-  linked_list_t *base_p = linked_list_del(&(root)->node, &(root)->node); \
+  arrow_linked_list_t *base_p = linked_list_del(&(root)->node, &(root)->node); \
   if ( base_p ) root = container_of(base_p, type, node); \
   else root = NULL; \
 }
 
 #define linked_list_del_node_last(root, type) { \
-  linked_list_t *base_p = linked_list_del_last(&(root)->node); \
+  arrow_linked_list_t *base_p = linked_list_del_last(&(root)->node); \
   if ( base_p ) root = container_of(base_p, type, node); \
   else root = NULL; \
 }
