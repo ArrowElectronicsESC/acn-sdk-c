@@ -77,7 +77,7 @@
 #define TELEMETRY_MAGNETOMETER_Y    "f|magnetometerY"
 #define TELEMETRY_MAGNETOMETER_Z    "f|magnetometerZ"
 #if !defined(TELEMETRY_DELAY)
-#define TELEMETRY_DELAY             5000
+#define TELEMETRY_DELAY             10
 #endif
 #if !defined(ARROW_MAX_RETRY)
 #define ARROW_MAX_RETRY -1
