@@ -75,6 +75,10 @@ int mqtt_connect_ibm(arrow_device_t *device,
                  gatewayType, gatewayId);
   p_topic[ret] = '\0';
 
+  ret = snprintf(s_topic, sizeof(s_topic), "iot-2/type/%s/id/%s/cmd/+/fmt/+",
+                 gatewayType, gatewayId);
+  s_topic[ret] = '\0';
+
   MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
   data.willFlag = 0;
   data.MQTTVersion = 3;
