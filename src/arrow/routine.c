@@ -65,6 +65,7 @@ int arrow_connect_device(arrow_gateway_t *gateway, arrow_device_t *device) {
           if ( list.enabled ) {
               DBG("device: %s", P_VALUE(list.name));
           }
+          device_info_free(&list);
       }
   }
   return 0;
@@ -134,7 +135,7 @@ arrow_routine_error_t arrow_mqtt_connect_routine(void) {
   // init MQTT
   DBG("mqtt connect...");
   int retry = 0;
-  while ( mqtt_connect(&_gateway, &_device, &_gateway_config) < 0 ) {
+  while ( mqtt_telemetry_connect(&_gateway, &_device, &_gateway_config) < 0 ) {
       RETRY_UP(retry, {return ROUTINE_MQTT_CONNECT_FAILED;});
       DBG(DEVICE_MQTT_CONNECT, "fail");
       msleep(ARROW_RETRY_DELAY);
@@ -144,7 +145,13 @@ arrow_routine_error_t arrow_mqtt_connect_routine(void) {
   arrow_state_mqtt_run(&_device);
   RETRY_CR(retry);
 #if !defined(NO_EVENTS)
-  while(mqtt_subscribe() < 0 ) {
+  while(mqtt_subscribe_connect(&_gateway, &_device, &_gateway_config) < 0 ) {
+      RETRY_UP(retry, {return ROUTINE_MQTT_SUBSCRIBE_FAILED;});
+      DBG(DEVICE_MQTT_CONNECT, "fail");
+      msleep(ARROW_RETRY_DELAY);
+  }
+  RETRY_CR(retry);
+  while( mqtt_subscribe() < 0 ) {
       RETRY_UP(retry, {return ROUTINE_MQTT_SUBSCRIBE_FAILED;});
       DBG(DEVICE_MQTT_CONNECT, "fail");
       msleep(ARROW_RETRY_DELAY);
@@ -156,8 +163,7 @@ arrow_routine_error_t arrow_mqtt_connect_routine(void) {
 
 arrow_routine_error_t arrow_mqtt_disconnect_routine() {
     if ( _init_mqtt ) {
-        if ( mqtt_is_connect() )
-            mqtt_disconnect();
+        mqtt_close();
         _init_mqtt = 0;
         return ROUTINE_SUCCESS;
     }
@@ -171,11 +177,7 @@ arrow_routine_error_t arrow_mqtt_send_telemetry_routine(get_data_cb data_cb, voi
   }
   wdt_feed();
   while (1) {
-#if defined(NO_EVENTS)
-      msleep(TELEMETRY_DELAY);
-#else
       mqtt_yield(TELEMETRY_DELAY);
-#endif
       int get_data_result = data_cb(data);
       if ( get_data_result < 0 ) {
           DBG(DEVICE_MQTT_TELEMETRY, "Fail to get telemetry data");
@@ -207,6 +209,7 @@ void arrow_close(void) {
   if ( _init_done ) {
     arrow_device_free(&_device);
     arrow_gateway_free(&_gateway);
+    arrow_gateway_config_free(&_gateway_config);
     _init_done = 0;
   }
 }
