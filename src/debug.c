@@ -2,6 +2,8 @@
 
 #include <sys/mem.h>
 
+#if defined(debug)
+
 char dbg_buffer[DBG_LINE_SIZE] __attribute__((weak));
 
 #if defined(__USE_STD__)
@@ -20,6 +22,7 @@ __attribute__((weak)) void dbg_line(const char *fmt, ...) {
   (void)(fmt);
   // dammy printf; do nothing
 }
+#endif
 #endif
 
 __attribute__((weak)) void hex_dump(const char *data, int size) {
